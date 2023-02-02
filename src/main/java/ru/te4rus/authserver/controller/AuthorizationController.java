@@ -14,7 +14,7 @@ import ru.te4rus.authserver.service.AuthService;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthorizationController {
 
     private final AuthService authService;
 

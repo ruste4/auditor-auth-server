@@ -10,16 +10,14 @@ import ru.te4rus.authserver.domain.JwtRequest;
 import ru.te4rus.authserver.domain.JwtResponse;
 import ru.te4rus.authserver.domain.User;
 import ru.te4rus.authserver.exception.AuthException;
-
-import java.util.HashMap;
-import java.util.Map;
+import ru.te4rus.authserver.repository.RefreshTokenRepository;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserService userService;
-    private final Map<String, String> refreshStorage = new HashMap<>();
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
 
     public JwtResponse login(@NonNull JwtRequest authRequest) {
@@ -28,7 +26,7 @@ public class AuthService {
         if (user.getPassword().equals(authRequest.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(user);
             final String refreshToken = jwtProvider.generateRefreshToken(user);
-            refreshStorage.put(user.getLogin(), refreshToken);
+            refreshTokenRepository.add(user.getLogin(), refreshToken);
             return new JwtResponse(accessToken, refreshToken);
         } else {
             throw new AuthException("Неправильный пароль");
@@ -39,7 +37,7 @@ public class AuthService {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String login = claims.getSubject();
-            final String saveRefreshToken = refreshStorage.get(login);
+            final String saveRefreshToken = refreshTokenRepository.findByLogin(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final User user = userService.getByLogin(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
@@ -54,13 +52,13 @@ public class AuthService {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String login = claims.getSubject();
-            final String saveRefreshToken = refreshStorage.get(login);
+            final String saveRefreshToken = refreshTokenRepository.findByLogin(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final User user = userService.getByLogin(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);
-                refreshStorage.put(user.getLogin(), newRefreshToken);
+                refreshTokenRepository.add(user.getLogin(), newRefreshToken);
                 return new JwtResponse(accessToken, newRefreshToken);
             }
         }
