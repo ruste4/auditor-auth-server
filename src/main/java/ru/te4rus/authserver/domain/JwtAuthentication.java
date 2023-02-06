@@ -15,7 +15,7 @@ public class JwtAuthentication implements Authentication {
     private boolean authenticated;
     private String username;
     private String firstName;
-    private Set<Role> roles;
+    private Set<ERole> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() { return roles; }
@@ -27,7 +27,7 @@ public class JwtAuthentication implements Authentication {
     public Object getDetails() { return null; }
 
     @Override
-    public Object getPrincipal() { return username; }
+    public String getPrincipal() { return username; }
 
     @Override
     public boolean isAuthenticated() { return authenticated; }

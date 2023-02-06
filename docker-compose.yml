@@ -1,10 +1,19 @@
 version: "3.8"
 services:
   redis:
-    container_name: "redis"
+    container_name: "refresh-token-storage"
     image: redis:alpine
     command: redis-server /usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
     volumes:
       - "$PWD/redis.conf:/usr/local/etc/redis/redis.conf"
+  db:
+    container_name: "auth-server-db"
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "auth_server_db"
+      POSTGRES_USER: "auth_server"
+      POSTGRES_PASSWORD: "secret"

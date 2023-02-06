@@ -27,7 +27,6 @@ public class RefreshTokenRepository implements RedisRepository {
     @Override
     public void add(String login, String refreshToken) {
         hashOperations.put(KEY, login, refreshToken);
-        System.out.println(hashOperations.entries(KEY));
     }
 
     @Override

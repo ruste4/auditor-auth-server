@@ -1,19 +1,25 @@
 package ru.te4rus.authserver.domain;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@RequiredArgsConstructor
-public enum Role implements GrantedAuthority {
+import javax.persistence.*;
 
-    ADMIN("ADMIN"),
-    USER("USER");
+@Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "roles")
+public class Role {
 
-    private final String vale;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-    @Override
-    public String getAuthority() {
-        return vale;
-    }
+    @Enumerated(EnumType.STRING)
+    private ERole name;
 
 }
