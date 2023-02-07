@@ -3,6 +3,7 @@ package ru.te4rus.authserver.service;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.te4rus.authserver.domain.JwtAuthentication;
@@ -12,6 +13,7 @@ import ru.te4rus.authserver.domain.User;
 import ru.te4rus.authserver.exception.AuthException;
 import ru.te4rus.authserver.repository.RefreshTokenRepository;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -23,6 +25,7 @@ public class AuthService {
 
 
     public JwtResponse login(@NonNull JwtRequest authRequest) {
+        log.debug(String.format("Логин: %s", authRequest) );
         User user = userService.getByLogin(authRequest.getLogin())
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
         if (user.getPassword().equals(authRequest.getPassword())) {
@@ -39,6 +42,7 @@ public class AuthService {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             String login = claims.getSubject();
+            log.debug(String.format("Получить accessToken для пользователя с логином: %s", login));
             String saveRefreshToken = refreshTokenRepository.findByLogin(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 User user = userService.getByLogin(login)
@@ -54,6 +58,7 @@ public class AuthService {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             String login = claims.getSubject();
+            log.debug(String.format("Обновить токен для пользоателя с логином: %s", login));
             String saveRefreshToken = refreshTokenRepository.findByLogin(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 User user = userService.getByLogin(login)

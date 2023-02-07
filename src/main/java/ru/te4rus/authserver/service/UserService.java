@@ -4,13 +4,16 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.te4rus.authserver.domain.ERole;
 import ru.te4rus.authserver.domain.JwtAuthentication;
+import ru.te4rus.authserver.domain.Role;
 import ru.te4rus.authserver.domain.User;
 import ru.te4rus.authserver.exception.AuthException;
 import ru.te4rus.authserver.exception.UserNotFoundException;
 import ru.te4rus.authserver.repository.RoleRepository;
 import ru.te4rus.authserver.repository.UserRepository;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -20,11 +23,18 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final RoleRepository roleRepository;
+
+    private final ERole DEFAULT_EROLE_BY_REGISTRATION = ERole.USER;
+
+
     public User add(@NonNull User user) {
+        Role role = roleRepository.findByName(DEFAULT_EROLE_BY_REGISTRATION);
+        user.setRoles(Collections.singletonList(role));
         return userRepository.save(user);
     }
 
-    public User update(@NonNull User user, JwtAuthentication authInfo) {
+    public User update(@NonNull User user, @NonNull JwtAuthentication authInfo) {
         String currentUserLogin = authInfo.getPrincipal();
 
         if (!currentUserLogin.equals(user.getLogin())) {
@@ -52,10 +62,6 @@ public class UserService {
 
         if (user.getLastName() != null) {
             userFromDB.setLastName(user.getLastName());
-        }
-
-        if (user.getRoles() != null) {
-            userFromDB.setRoles(user.getRoles());
         }
 
         return userFromDB;
