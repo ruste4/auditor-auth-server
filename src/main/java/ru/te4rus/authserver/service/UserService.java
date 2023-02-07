@@ -4,16 +4,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.te4rus.authserver.domain.ERole;
 import ru.te4rus.authserver.domain.JwtAuthentication;
-import ru.te4rus.authserver.domain.Role;
 import ru.te4rus.authserver.domain.User;
 import ru.te4rus.authserver.exception.AuthException;
 import ru.te4rus.authserver.exception.UserNotFoundException;
 import ru.te4rus.authserver.repository.RoleRepository;
 import ru.te4rus.authserver.repository.UserRepository;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -22,7 +19,6 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
     public User add(@NonNull User user) {
         return userRepository.save(user);
